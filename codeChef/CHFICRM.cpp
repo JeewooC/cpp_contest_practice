@@ -1,5 +1,5 @@
 #include <iostream>
-using namespace std
+using namespace std;
 
 bool query(int N, int arr[]) {
     if (arr[0] != 5) {
