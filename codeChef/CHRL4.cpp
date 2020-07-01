@@ -1,42 +1,33 @@
-#include <algorithm>
-#include <climits>
-#include <iostream>
-#include <math.h>
+#include <bits/stdc++.h>
+
+#define maxn 100000
+#define mod 1000000007
 using namespace std;
+
+double dp[maxn];
+long ans[maxn];
+priority_queue<pair<double, int>> pq;
 
 int main() {
     int N, K;
     cin >> N >> K;
-    long specialNumbers[N];
+    int specialNumbers[N];
     for (int i = 0; i < N; i++) {
-        cin >> specialNumbers[i];
-    }
-    
-    long d[N];
-    fill_n(d, N, LONG_MAX);
-    if (specialNumbers[0] == 1) {
-        d[0] = 1;
-    } else {
-        d[0] = log(specialNumbers[0]);
+      cin >> specialNumbers[i];
     }
 
-    for (int currentIndex = 0; currentIndex < N-1; currentIndex++) {
-        for (int j = currentIndex+1; j-currentIndex <= K; j++) {
-            if (j >= N) {
-                break;
-            }
-            if (d[currentIndex] * specialNumbers[j] == 1) {
-                if (1 < d[j]) {
-                    d[j] = 1;
-                }
-            } else {
-                if (log(d[currentIndex] * specialNumbers[j]) < d[j]) {
-                    d[j] = log(d[currentIndex] * specialNumbers[j]);
-                }
-            }
-        }
+    dp[0] = log(specialNumbers[0]);
+    ans[0] = specialNumbers[0];
+    pq.push(make_pair(-dp[0], 0));
+
+    for (int i = 1; i < N; i++) {
+      while (i - pq.top().second > K) {
+        pq.pop();
+      }
+      dp[i] = dp[pq.top().second] + log(specialNumbers[i]);
+      ans[i] = (ans[pq.top().second] * 1LL * specialNumbers[i]) % mod;
+      pq.push(make_pair(-dp[i], i));
     }
 
-    long res = exp(d[N-1]);
-    cout << res%1000000007 << endl;
+    cout << ans[N-1] << endl;
 }
