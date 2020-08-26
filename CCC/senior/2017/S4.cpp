@@ -65,6 +65,7 @@ bool comparePipes (Pipe i, Pipe j) {
 }
 
 int main() {
+  ios_base::sync_with_stdio(false);
   int N, M, D;
   cin >> N >> M >> D;
   vector<Pipe> pipes;
@@ -81,7 +82,7 @@ int main() {
   }
   sort(pipes.begin(), pipes.end(), comparePipes);
 
-  int days = 0, i = 0;
+  int days = 0, i = 0, max = 0;
   UF uf = UF(N);
 
   while (uf.getCount() > 1) {
@@ -94,8 +95,23 @@ int main() {
       if (active == 0) {
         days++;
       }
+      max = pipes.at(i).cost;
     }
     i++;
+  }
+
+  if (pipes.at(i-1).active == 0) {
+    UF uf2(N);
+    for (Pipe p : pipes) {
+      if (!uf2.connected(p.src, p.dest)) {
+        if (p.cost < max || (p.cost == max && p.active == 1)) {
+          uf2.merge(p.src, p.dest);
+        } else if (p.active == 1 && p.cost <= D) {
+          days--;
+          break;
+        }
+      }
+    }
   }
 
   cout << days << endl;
