@@ -1,9 +1,53 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+struct Step {
+  int R, P;
+  string W;
+
+  Step(int r, int p, string w) {
+    R = r;
+    P = p;
+    W = w;
+  }
+};
+
+void dfs(int S, string I, string F, vector<Step> steps, pair<string, string> subRules[3], set<pair<int, string>> &memo) {
+  if (S == 0 && I == F) {
+    for (Step s : steps) {
+      cout << s.R << ' ' << s.P << ' ' << s.W << '\n';
+    }
+    exit(0);
+  }
+
+  if (S == 0) {
+    return;
+  } else {
+      if (memo.find(make_pair(S, I)) != memo.end()) {
+        return;
+      }
+      memo.insert(make_pair(S, I));
+      for (int i = 0; i < 3; i++) {
+        int searchIndex = 0;
+        while (searchIndex < I.size() && I.substr(searchIndex).find(subRules[i].first) != string::npos) {
+          if (searchIndex != 0) {
+            S--;
+          }
+
+          int index = I.substr(searchIndex).find(subRules[i].first);
+          string modified = I.substr(0, index) + subRules[i].second + I.substr(index+subRules[i].first.size());
+          steps.push_back(Step(i+1, index+1, modified));
+          dfs(S-1, modified, F, steps, subRules, memo);
+          steps.pop_back();
+          searchIndex = index+subRules[i].second.size();
+        }
+      }
+    }
+  }
+
 int main() {
   ios_base::sync_with_stdio(false);
-  // store substitution rules as a pair in an array
+
   pair<string, string> subRules[3];
   for (int i = 0; i < 3; i++) {
     string A, B;
@@ -14,37 +58,10 @@ int main() {
   int S;
   string I, F;
   cin >> S >> I >> F;
+  vector<Step> steps;
+  set<pair<int, string>> memo;
 
-  int currentIndex = 0;
-  while (S > 0) {
-    // if the current index is out of bounds, restart from the beginning
-    if (currentIndex >= I.size()) {
-      currentIndex = 0;
-    }
-    // if there is a substitution rule that applies to this particular index, find which rule number it is
-    // if there isn't, move forward one index
-    int ruleNumber;
-    if (currentIndex + subRules[0].first.size() <= I.size() &&
-        I.substr(currentIndex, subRules[0].first.size()) == subRules[0].first) {
-      ruleNumber = 0;
-    } else if (currentIndex + subRules[1].first.size() <= I.size() &&
-        I.substr(currentIndex, subRules[1].first.size()) == subRules[1].first) {
-      ruleNumber = 1;
-    } else if (currentIndex + subRules[2].first.size() <= I.size() &&
-        I.substr(currentIndex, subRules[2].first.size()) == subRules[2].first) {
-      ruleNumber = 2;
-    } else {
-      currentIndex++;
-      continue;
-    }
-    I = I.substr(0, currentIndex) +
-        subRules[ruleNumber].second +
-        I.substr(currentIndex + subRules[ruleNumber].first.size());
-
-    cout << ruleNumber+1 << ' ' << currentIndex+1 << ' ' << I << '\n';
-
-    currentIndex += subRules[ruleNumber].second.size();
-    S--;
-  }
+  dfs(S, I, F, steps, subRules, memo);
   return 0;
 }
+
