@@ -59,11 +59,11 @@ int main() {
     // finding all the "vertices" that are within this "window's" area
     // each unit/square is represented by its top left vertex
     // (stop loop before the bottom right vertex because the bottom right vertex represents a square outside the window)
-    for (int xIdx = binarySearch(x1, xCoords);
-    xCoords.at(xIdx) < x2 && xIdx < xCoords.size()-1; xIdx++) {
+    int xIdx = binarySearch(x1, xCoords);
+    for (; xIdx < xCoords.size()-1 && xCoords.at(xIdx) < x2; xIdx++) {
 
-      for (int yIdx = binarySearch(y1, yCoords);
-      yCoords.at(yIdx) < y2 && yIdx < yCoords.size()-1; yIdx++) {
+      int yIdx = binarySearch(y1, yCoords);
+      for (; yIdx < yCoords.size()-1 && yCoords.at(yIdx) < y2; yIdx++) {
 
         // if this section has already reached T before, don't add it to total (preventing double adding)
         if (tintGrid[xIdx][yIdx] < T) {
